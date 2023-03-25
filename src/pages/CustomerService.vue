@@ -2,7 +2,7 @@
   <div class="chat-box">
     <a-card class="chat-card">
       <a-menu id="dddddd" mode="inline" class="contacts-list">
-        <a-menu-item key="1">admin</a-menu-item>
+        <a-menu-item key="1">Option1</a-menu-item>
       </a-menu>
       <div class="chat-content">
         <div class="chat-message">
@@ -30,9 +30,11 @@
           </div>
         </div>
         <a-textarea
+          v-model:value="chatMsg"
           class="textarea"
           placeholder="回车发送消息"
           :auto-size="{ minRows: 2, maxRows: 5 }"
+          @pressEnter="sendMsg"
         />
       </div>
     </a-card>
@@ -41,15 +43,21 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { useTIMStore } from "../store/chat";
+const chatMsg = ref("");
+const TIMStore = useTIMStore();
 const chatLogs = ref([
   { text: "text1", flow: "in" },
   { text: "text2", flow: "out" },
   { text: "text3", flow: "in" },
-
   { text: "text1", flow: "in" },
   { text: "text2", flow: "out" },
   { text: "text3", flow: "in" },
 ]);
+const sendMsg = () => {
+  console.log(chatMsg.value);
+  TIMStore.timeCore.sendMessage("admin", { text: chatMsg.value });
+};
 </script>
 
 <style scoped lang="scss">

@@ -56,6 +56,7 @@ import {
 import { defineComponent, ref } from "vue";
 
 import { useRouter } from "vue-router";
+import { useTIMStore } from "../store/chat";
 export default defineComponent({
   components: {
     UserOutlined,
@@ -65,6 +66,11 @@ export default defineComponent({
     MenuFoldOutlined,
   },
   setup() {
+    const TIMStore = useTIMStore();
+    // 订阅sdk 接收功能
+    TIMStore.timeCore.messageReceived = (event) => {
+      TIMStore.subscribeMessage(event);
+    };
     const router = useRouter();
     const loginOut = () => {
       router.push("login");

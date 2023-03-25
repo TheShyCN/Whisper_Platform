@@ -8,3 +8,16 @@ export interface TIMCoreLoginParams {
   // 密码
   userSig: string;
 }
+
+export interface ITextPayload {
+  text: string;
+}
+
+export interface ITextMessageEvent {
+  name: string;
+  data: TextMessage[];
+}
+
+export interface TextMessage {
+  payload: ITextPayload;
+}
