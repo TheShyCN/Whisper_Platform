@@ -30,6 +30,26 @@ export default class TIMCore {
 
     // 注册腾讯云即时通信 IM 上传插件
     this.tim.registerPlugin({ "tim-upload-plugin": TIMUploadPlugin });
+    this.persistedLogin();
+  };
+
+  private persistedLogin = () => {
+    const timCoreLoginParams = JSON.parse(
+      localStorage.getItem("TIMCoreLoginParams") || "{}"
+    );
+    if (timCoreLoginParams.userID) {
+      this.timLogin(timCoreLoginParams);
+    }
+  };
+
+  public timLogout = () => {
+    this.unBindTIMEvent();
+    this.tim?.logout();
+  };
+
+  public unBindTIMEvent = () => {
+    this.tim?.off(TIM.EVENT.MESSAGE_RECEIVED, () => {});
+    this.tim?.off(TIM.EVENT.SDK_READY, () => {});
   };
   /**
    * 登录功能
@@ -38,6 +58,8 @@ export default class TIMCore {
   public timLogin = async (options: TIMCoreLoginParams) => {
     // 第一步,登录SDK
     await this.tim?.login(options);
+    // 持久化登录相关的密钥
+    localStorage.setItem("TIMCoreLoginParams", JSON.stringify(options));
     this.userID = options.userID;
     this.bindTIMEvent();
   };
@@ -50,6 +72,7 @@ export default class TIMCore {
   }
   private handleSDKReady = () => {
     console.log("SDK 准备完成");
+    this.onReady();
     this.tim?.on(TIM.EVENT.MESSAGE_RECEIVED, this.handleMessageReceived, this);
   };
   private handleMessageReceived = (event: ITextMessageEvent) => {
@@ -85,4 +108,5 @@ export default class TIMCore {
     await this.tim?.sendMessage(messageOptions!);
     console.log("发送成功");
   };
+  public onReady = () => {};
 }

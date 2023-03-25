@@ -12,6 +12,6 @@ import TIMCore from "./Tim-core";
 export default (context: PiniaPluginContext) => {
   if (context.options.TIMOptions) {
     const timCore = new TIMCore(context.options.TIMOptions());
-    context.store.timeCore = timCore;
+    context.store.timCore = timCore;
   }
 };

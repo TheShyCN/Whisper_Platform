@@ -20,4 +20,6 @@ export interface ITextMessageEvent {
 
 export interface TextMessage {
   payload: ITextPayload;
+  flow: "in" | "out";
+  conversationID: string;
 }

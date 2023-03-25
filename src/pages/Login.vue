@@ -58,11 +58,11 @@ const login = async () => {
       "74d3bcbf2f1d9a2fcd57291057c8e386eb14af5a2eed3afd23dc68f4f7811065",
   });
 
-  await TIMStore.timeCore.timLogin({
+  await TIMStore.timCore.timLogin({
     userSig: data.userSig,
     userID: formState.username,
   });
-  console.log(TIMStore.timeCore);
+  console.log(TIMStore.timCore);
 
   router.push("home");
 };

@@ -13,6 +13,6 @@ declare module "pinia" {
     /**
      *tim核心功能
      */
-    timeCore: TIMCore;
+    timCore: TIMCore;
   }
 }

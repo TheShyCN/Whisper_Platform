@@ -1,8 +1,18 @@
 <template>
   <div class="chat-box">
     <a-card class="chat-card">
-      <a-menu id="dddddd" mode="inline" class="contacts-list">
-        <a-menu-item key="1">Option1</a-menu-item>
+      <a-menu
+        id="dddddd"
+        mode="inline"
+        class="contacts-list"
+        v-model:selectedKeys="TIMStore.selectedKeys"
+      >
+        <a-menu-item
+          v-for="item in TIMStore.conversationList"
+          :key="item.userProfile?.userID"
+          @click="selectMenu(item.userProfile?.userID!)"
+          >{{ item.userProfile?.userID }}</a-menu-item
+        >
       </a-menu>
       <div class="chat-content">
         <div class="chat-message">
@@ -25,7 +35,7 @@
                   fill_tow: item.flow === 'in',
                 }"
               ></div>
-              <div>{{ item.text }}</div>
+              <div>{{ item.payload.text }}</div>
             </div>
           </div>
         </div>
@@ -42,21 +52,47 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useTIMStore } from "../store/chat";
+import { TextMessage } from "../store/plugins/TIM-plugin/type";
 const chatMsg = ref("");
 const TIMStore = useTIMStore();
-const chatLogs = ref([
-  { text: "text1", flow: "in" },
-  { text: "text2", flow: "out" },
-  { text: "text3", flow: "in" },
-  { text: "text1", flow: "in" },
-  { text: "text2", flow: "out" },
-  { text: "text3", flow: "in" },
-]);
-const sendMsg = () => {
-  console.log(chatMsg.value);
-  TIMStore.timeCore.sendMessage("admin", { text: chatMsg.value });
+const currentChat = ref<TextMessage[]>([]);
+TIMStore.timCore.onReady = () => {
+  TIMStore.getSessionList();
+};
+TIMStore.$onAction(({ name, args }) => {
+  // 确定当前调用的是订阅
+  if (name === "subscribeMessage") {
+    // 把接收到的消息反馈到页面上
+    currentChat.value.push(...args[0].data);
+  }
+});
+const chatLogs = computed<TextMessage[]>(() => {
+  return [...TIMStore.historyMessage, ...currentChat.value];
+});
+
+const sendMsg = async () => {
+  await TIMStore.timCore.sendMessage(TIMStore.selectedKeys[0], {
+    text: chatMsg.value,
+  });
+
+  currentChat.value.push({
+    payload: {
+      text: chatMsg.value,
+    },
+    flow: "out",
+    conversationID: "",
+  });
+
+  chatMsg.value = "";
+};
+
+const selectMenu = (key: string) => {
+  // 清空当前的消息
+  currentChat.value = [];
+  // 获取当前会话的历史记录
+  TIMStore.getMessageHistoryList(key);
 };
 </script>
 

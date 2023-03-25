@@ -68,11 +68,12 @@ export default defineComponent({
   setup() {
     const TIMStore = useTIMStore();
     // 订阅sdk 接收功能
-    TIMStore.timeCore.messageReceived = (event) => {
+    TIMStore.timCore.messageReceived = (event) => {
       TIMStore.subscribeMessage(event);
     };
     const router = useRouter();
     const loginOut = () => {
+      TIMStore.timCore.timLogout();
       router.push("login");
     };
     const linkPage = ({ key }: { key: string }) => {
